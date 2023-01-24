@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- message form -->
+    <div>
+        <input type="text" name="message" id="inp">
+        <input type="submit" value="Send" id="btn">
+    </div>
+
+    <!-- div with messages -->
+    <div id="messages"></div>
+</body>
+<script>
+    let btn = document.getElementById('btn');
+    let socket = new WebSocket('ws://localhost:9999/');
+    btn.onclick = () => {
+
+        let val = document.getElementById('inp').value;
+        setTimeout(() => {
+            socket.send(val)
+        }, 1000)
+        socket.onmessage = (msg) => {
+            console.log(msg.data)
+            document.getElementById('messages').innerText = msg.data
+        }
+
+    }
+</script>
+
+</html>
