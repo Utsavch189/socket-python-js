@@ -11,7 +11,11 @@
 <body>
     <!-- message form -->
     <div>
+        <h2 id="id"></h2>
+        <h4>Your message</h4>
         <input type="text" name="message" id="inp">
+        <h4>whom to send</h4>
+        <input type="text" name="message" id="to">
         <input type="submit" value="Send" id="btn">
     </div>
 
@@ -21,16 +25,49 @@
 <script>
     let btn = document.getElementById('btn');
     let socket = new WebSocket('ws://localhost:9999/');
+    const id = document.getElementById("id");
+
+    socket.onmessage = (msg) => {
+        console.log(msg.data)
+        document.getElementById('messages').innerText = msg.data
+    }
+
+    addEventListener("load", (event) => {
+        try {
+            if (!localStorage.getItem("id")) {
+                localStorage.setItem("id", Math.floor(Math.random() * 100))
+            }
+        } catch {
+            console.log("can't save")
+        }
+
+        id.innerText = `My ID is : ${localStorage.getItem("id")}`
+        const data = {
+            id: localStorage.getItem("id"),
+            init: 1
+        }
+        setTimeout(() => {
+            try {
+                socket.send(JSON.stringify(data))
+            } catch {
+                console.log("can't send")
+            }
+        }, 1000)
+    });
+
     btn.onclick = () => {
 
         let val = document.getElementById('inp').value;
-        setTimeout(() => {
-            socket.send(val)
-        }, 1000)
-        socket.onmessage = (msg) => {
-            console.log(msg.data)
-            document.getElementById('messages').innerText = msg.data
+        let to = document.getElementById('to').value;
+        const data = {
+            message: val,
+            id: localStorage.getItem("id"),
+            to: to,
+            init: 0
         }
+        setTimeout(() => {
+            socket.send(JSON.stringify(data))
+        }, 1000)
 
     }
 </script>

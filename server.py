@@ -1,28 +1,37 @@
 import asyncio
 import websockets
+import json
+from cache import Cache
 
-all_clients=[]
+MEMORY=Cache(126)
 
 
-async def send_msg(msg,target):
-    for c in all_clients:
-        if(c==target):
-            await c.send(msg)
+async def send_msg(res):
+    target=res['to']
+    if(MEMORY.get(target)):
+        socket=MEMORY.get(target)['socket']
+        await socket.send(res['message'])
 
-async def new_connection(client_socket,path):
-    print("new connection","connection address : ",client_socket)
-    all_clients.append(client_socket)
+async def save_client(res):
+    MEMORY.put(res['id'],res)
+
+async def connection(client_socket):
     while True:
         try:
-            new_msg=await client_socket.recv()
-            print("from client : ",new_msg)
-            await send_msg(new_msg,client_socket)
+            res=json.loads(await client_socket.recv())
+            if(res['init']==1):
+                print("new connection...")
+                new_user=(res | {'socket':client_socket})
+                await save_client(new_user)
+                print("user saved")
+            else:
+                await send_msg(res)
         except:
             continue
 
 async def start_server():
     print("server is listening!")
-    await websockets.serve(new_connection,"localhost","9999")
+    await websockets.serve(connection,"localhost","9999")
 
 
 event_loop=asyncio.get_event_loop()
