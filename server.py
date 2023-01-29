@@ -5,7 +5,8 @@ from cache import Cache
 import socket
 
 MEMORY=Cache(126)
-
+HOST='127.0.0.1'
+PORT=9999
 
 async def send_msg(res):
     target=res['to']
@@ -34,9 +35,10 @@ async def connection(client_socket,path):
             return socket.error 
 
 async def start_server():
-    print("server is listening!")
+    global HOST,PORT
+    print(f"server is listening at {HOST}:{PORT}...")
     try:
-        await websockets.serve(connection,"127.0.0.1",9999)
+        await websockets.serve(connection,HOST,PORT)
     except Exception as e:
         print(e)
 
