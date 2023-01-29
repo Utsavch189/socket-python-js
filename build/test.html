@@ -24,7 +24,7 @@
 </body>
 <script>
     let btn = document.getElementById('btn');
-    let socket = new WebSocket('ws://127.0.0.1:9999/socket');
+    let socket = new WebSocket('ws://0.tcp.in.ngrok.io:17817/', "soap");
     const id = document.getElementById("id");
 
     socket.onmessage = (msg) => {
