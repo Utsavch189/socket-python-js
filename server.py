@@ -9,12 +9,14 @@ HOST='127.0.0.1'
 PORT=9999
 
 async def send_msg(res):
+    global MEMORY
     target=res['to']
     if(MEMORY.get(target)):
         socket=MEMORY.get(target)['socket']
         await socket.send(res['message'])
 
 async def save_client(res):
+    global MEMORY
     MEMORY.put(res['id'],res)
 
 async def connection(client_socket,path):    
@@ -42,7 +44,9 @@ async def start_server():
     except Exception as e:
         print(e)
 
+def run():
+    event_loop=asyncio.get_event_loop()
+    event_loop.run_until_complete(start_server())
+    event_loop.run_forever()
 
-event_loop=asyncio.get_event_loop()
-event_loop.run_until_complete(start_server())
-event_loop.run_forever()
+run()
